@@ -1,0 +1,108 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="header-left">
+        <h1>EFACT</h1>
+        <span class="subtitle">Visualizador de Documentos</span>
+      </div>
+      <div class="header-right">
+        <button class="btn-logout" (click)="logout()">
+          <span>Cerrar Sesión</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <div class="document-viewer">
+      <div class="tabs">
+        <button class="tab" [class.active]="activeTab === 'pdf'" (click)="setActiveTab('pdf')">
+          <span>📄 PDF</span>
+        </button>
+        <button class="tab" [class.active]="activeTab === 'xml'" (click)="setActiveTab('xml')">
+          <span>📝 XML</span>
+        </button>
+        <button class="tab" [class.active]="activeTab === 'cdr'" (click)="setActiveTab('cdr')">
+          <span>✉️ CDR</span>
+        </button>
+      </div>
+
+      <div class="tab-content">
+        <div class="actions-bar">
+          <div class="actions-left">
+            <h2>
+              <span *ngIf="activeTab === 'pdf'">Comprobante PDF</span>
+              <span *ngIf="activeTab === 'xml'">XML Firmado</span>
+              <span *ngIf="activeTab === 'cdr'">Constancia de Recepción (CDR)</span>
+            </h2>
+          </div>
+          <div class="actions-right">
+            <button class="btn-action" (click)="reloadDocument()" title="Recargar">Recargar</button>
+            <button
+              class="btn-action btn-download"
+              *ngIf="activeTab === 'pdf' && !isLoadingPDF && pdfUrl"
+              (click)="downloadPDF()"
+            >
+              Descargar PDF
+            </button>
+            <button
+              class="btn-action btn-download"
+              *ngIf="activeTab === 'xml' && !isLoadingXML && xmlContent"
+              (click)="downloadXML()"
+            >
+              Descargar XML
+            </button>
+            <button
+              class="btn-action btn-download"
+              *ngIf="activeTab === 'cdr' && !isLoadingCDR && cdrContent"
+              (click)="downloadCDR()"
+            >
+              Descargar CDR
+            </button>
+          </div>
+        </div>
+
+        <div class="content-area" *ngIf="activeTab === 'pdf'">
+          <div class="loading" *ngIf="isLoadingPDF">
+            <div class="spinner"></div>
+            <p>Cargando PDF...</p>
+          </div>
+          <div class="error-message" *ngIf="pdfError">
+            {{ pdfError }}
+          </div>
+          <iframe
+            *ngIf="!isLoadingPDF && !pdfError && pdfUrl"
+            [src]="pdfUrl"
+            class="pdf-viewer"
+          ></iframe>
+        </div>
+
+        <div class="content-area" *ngIf="activeTab === 'xml'">
+          <div class="loading" *ngIf="isLoadingXML">
+            <div class="spinner"></div>
+            <p>Cargando XML...</p>
+          </div>
+          <div class="error-message" *ngIf="xmlError">
+            {{ xmlError }}
+          </div>
+          <pre class="xml-content" *ngIf="!isLoadingXML && !xmlError && xmlContent">{{
+            xmlContent
+          }}</pre>
+        </div>
+
+        <div class="content-area" *ngIf="activeTab === 'cdr'">
+          <div class="loading" *ngIf="isLoadingCDR">
+            <div class="spinner"></div>
+            <p>Cargando CDR...</p>
+          </div>
+          <div class="error-message" *ngIf="cdrError">
+            {{ cdrError }}
+          </div>
+          <pre class="xml-content" *ngIf="!isLoadingCDR && !cdrError && cdrContent">{{
+            cdrContent
+          }}</pre>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
