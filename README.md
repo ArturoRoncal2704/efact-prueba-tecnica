@@ -1,59 +1,174 @@
-# EfactPruebaTecnica
+# 📘 EFACT – Prueba Técnica Frontend (Angular)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.10.
+Aplicación desarrollada como parte de la **Prueba Técnica de Desarrollo Frontend** para EFACT.  
+El proyecto implementa un flujo completo de autenticación y visualización de documentos electrónicos utilizando Angular y los endpoints proporcionados en el enunciado.
 
-## Development server
+---
 
-To start a local development server, run:
+## 🚀 Funcionalidades principales
 
-```bash
-ng serve
+- ✅ Autenticación mediante formulario de login
+- ✅ Obtención de **token OAuth** a través del servicio de EFACT
+- ✅ Visualización de los tres documentos solicitados:
+  - 📄 **PDF del comprobante**
+  - 🧾 **XML firmado**
+  - 📬 **CDR (Constancia de Recepción)**
+- ✅ Descarga de documentos
+- ✅ Navegación mediante pestañas (tabs)
+- ✅ Cierre de sesión eliminando el token
+- ✅ Manejo de errores en autenticación y carga de documentos
+
+---
+
+## 🧩 Tecnologías utilizadas
+
+- **Angular 17+**
+- **TypeScript**
+- **RxJS**
+- **Angular Router**
+- **HttpClient**
+- **Angular Dev Proxy** (para evitar CORS en desarrollo)
+- **HTML / SCSS**
+
+---
+
+## 📄 Endpoints utilizados
+
+### 🔐 Token
+```
+POST /oauth/token
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+### 📄 Documentos
+```
+GET /v1/pdf/{ticket}
+GET /v1/xml/{ticket}
+GET /v1/cdr/{ticket}
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Todos los endpoints requieren autenticación via:  
+`Authorization: Bearer {token}`
 
-```bash
-ng generate --help
+---
+
+## 🧱 Arquitectura del proyecto
+```
+src/
+├── app/
+│   ├── core/
+│   │   ├── guards/
+│   │   │   └── auth.guard.ts          # Protección de rutas
+│   │   ├── interceptors/
+│   │   │   └── auth.interceptor.ts    # Inyección automática de token
+│   │   └── services/
+│   │       ├── auth.service.ts        # Servicio de autenticación
+│   │       └── document.service.ts    # Servicio de documentos
+│   ├── features/
+│   │   ├── login/                     # Componente de login
+│   │   └── dashboard/                 # Visualizador de documentos
+│   ├── app.config.ts                  # Configuración de la app
+│   └── app.routes.ts                  # Definición de rutas
+│
+├── environments/
+│   ├── environment.ts                 # Variables de desarrollo
+│
+└── styles.scss                        # Estilos globales
 ```
 
-## Building
+Estructura simple y modular para cumplir con los requisitos de la prueba.
 
-To build the project run:
+---
 
+## 🔧 Instalación y ejecución
+
+### 1️⃣ Clonar repositorio
 ```bash
-ng build
+git clone https://github.com/ArturoRoncal2704/efact-prueba-tecnica.git
+cd efact-prueba-tecnica
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
+### 2️⃣ Instalar dependencias
 ```bash
-ng test
+npm install
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
+### 3️⃣ Ejecutar servidor de desarrollo
 ```bash
-ng e2e
+ng serve -o
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+La aplicación estará disponible en `http://localhost:4200`
 
-## Additional Resources
+---
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## ➕ Configuración del proxy (evita CORS en desarrollo)
+
+Archivo `proxy.conf.json` en la raíz del proyecto:
+```json
+{
+  "/api-efact-ose": {
+    "target": "https://odin-dev.efact.pe",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}
+```
+
+En `angular.json`, dentro de `"serve"`:
+```json
+"serve": {
+  "builder": "@angular/build:dev-server",
+  "options": {
+    "proxyConfig": "proxy.conf.json"
+  }
+}
+```
+
+Esto permite consumir la API mediante rutas internas como:
+```
+/api-efact-ose/oauth/token
+/api-efact-ose/v1/pdf/{ticket}
+```
+
+---
+
+## 🔑 Credenciales de prueba
+
+Las credenciales fueron proporcionadas por EFACT para el desarrollo de esta prueba.  
+Se cargan por defecto en el formulario únicamente para facilitar la evaluación, pero pueden ser editadas libremente.
+```
+Usuario (RUC): 20111193035
+Contraseña: 61a77b6fda77c3a2d6b28930546c86d7f749ccf0bd4bad1e1192f13bb59f0f30
+Ticket: 571cc3a3-5b1f-4855-af26-0de6e7c5475f
+```
+
+> **Nota:** Las credenciales no representan información sensible y provienen del documento oficial de la prueba técnica.
+
+---
+
+## ✔️ Flujo funcional implementado
+
+### 1. Login
+- Formulario de usuario y contraseña
+- Manejo de errores en tiempo real
+- Consumo del servicio OAuth
+- Almacenamiento de token en `localStorage`
+
+### 2. Protección de rutas
+- `AuthGuard` evita que usuarios sin token ingresen a `/dashboard`
+
+### 3. Visualizador de documentos
+Tres pestañas:
+- **PDF**: Visor embebido + descarga
+- **XML**: Renderizado de texto + descarga
+- **CDR**: Renderizado + descarga
+
+Características adicionales:
+- Botón de recarga para cada documento
+- Manejo de respuestas `Blob`/`Text` según corresponda
+- Estados de carga con spinners
+- Manejo de errores específicos
+
+### 4. Cerrar sesión
+- Se elimina el token y se redirige a la pantalla de login
