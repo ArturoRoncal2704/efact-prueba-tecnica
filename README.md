@@ -164,11 +164,6 @@ Tres pestañas:
 - **XML**: Renderizado de texto + descarga
 - **CDR**: Renderizado + descarga
 
-Características adicionales:
-- Botón de recarga para cada documento
-- Manejo de respuestas `Blob`/`Text` según corresponda
-- Estados de carga con spinners
-- Manejo de errores específicos
 
 ### 4. Cerrar sesión
 - Se elimina el token y se redirige a la pantalla de login
